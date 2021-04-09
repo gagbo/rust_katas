@@ -1,11 +1,14 @@
 use std::collections::{HashMap, VecDeque};
 
+/// A chess position (x, y)
 pub type ChessPos = (isize, isize);
 
+/// A Chessboard, including a cached view of moves
 #[derive(Debug, Clone, Default)]
 pub struct ChessBoard {
     pub width: isize,
     pub height: isize,
+    /// Nodes is a map from Position to (Parent position, total number of moves)
     pub nodes: HashMap<ChessPos, (ChessPos, u8)>,
 }
 
@@ -17,37 +20,6 @@ impl ChessBoard {
             height,
             ..Default::default()
         }
-    }
-
-    /// Return true if m is a valid position on the board
-    pub fn is_valid(&self, m: &ChessPos) -> bool {
-        m.0 > 0 && m.1 > 0 && m.0 < self.width + 1 && m.1 < self.height + 1
-    }
-
-    /// Return the valid moves from pos for this board
-    ///
-    /// This part is specific to knight moves.
-    pub fn next_moves(&self, pos: ChessPos) -> Vec<ChessPos> {
-        [
-            (-1, -2),
-            (-1, 2),
-            (1, -2),
-            (1, 2),
-            (-2, -1),
-            (-2, 1),
-            (2, -1),
-            (2, 1),
-        ]
-        .iter()
-        .filter_map(|(dx, dy)| {
-            let new_pos: ChessPos = (pos.0 + dx, pos.1 + dy);
-            if self.is_valid(&new_pos) {
-                Some(new_pos)
-            } else {
-                None
-            }
-        })
-        .collect()
     }
 
     /// Return the number of moves from start_pos to dest
@@ -101,4 +73,37 @@ impl ChessBoard {
             })
             .into()
     }
+
+    /// Return true if m is a valid position on the board
+    pub fn is_valid(&self, m: &ChessPos) -> bool {
+        m.0 > 0 && m.1 > 0 && m.0 < self.width + 1 && m.1 < self.height + 1
+    }
+
+    /// Return the valid moves from pos for this board
+    ///
+    /// This part is specific to knight moves.
+    pub fn next_moves(&self, pos: ChessPos) -> Vec<ChessPos> {
+        // The knight has a finite set of moves so it easier
+        [
+            (-1, -2),
+            (-1, 2),
+            (1, -2),
+            (1, 2),
+            (-2, -1),
+            (-2, 1),
+            (2, -1),
+            (2, 1),
+        ]
+        .iter()
+        .filter_map(|(dx, dy)| {
+            let new_pos: ChessPos = (pos.0 + dx, pos.1 + dy);
+            if self.is_valid(&new_pos) {
+                Some(new_pos)
+            } else {
+                None
+            }
+        })
+        .collect()
+    }
+
 }
